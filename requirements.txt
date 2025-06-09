@@ -1,0 +1,8 @@
+flask
+requests
+pyjwt
+python-dotenv
+Flask-SQLAlchemy
+flask-jwt-extended
+marshmallow
+psycopg2
