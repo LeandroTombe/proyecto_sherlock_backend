@@ -1,9 +1,10 @@
 from flask import Flask, jsonify
 from dotenv import load_dotenv
-from extensions import db, jwt
+from extensions import db, jwt, migrate
 from auth import auth_bp
 from users import user_bp
 from jwt_handlers import register_jwt_handlers
+from jwt_callbacks import check_if_token_revoked
 import os
 
 # Cargar variables de entorno con manejo de codificación
@@ -18,17 +19,30 @@ def create_app():
     
     # Set default configuration for microservice
     app.config.update(
-        SQLALCHEMY_DATABASE_URI=os.getenv('DATABASE_URL', 'postgresql://postgres:postgres@localhost:5432/auth_db'),
+        SQLALCHEMY_DATABASE_URI=os.getenv('DATABASE_URL'),
         SQLALCHEMY_TRACK_MODIFICATIONS=False,
-        JWT_SECRET_KEY=os.getenv('FLASK_JWT_SECRET_KEY', 'your-secret-key'),
+        JWT_SECRET_KEY=os.getenv('FLASK_JWT_SECRET_KEY'),
         JWT_ACCESS_TOKEN_EXPIRES=3600,  # 1 hour
+        JWT_REFRESH_TOKEN_EXPIRES=30*24*3600,  # 30 days
+        JWT_TOKEN_LOCATION=["headers"],
+        JWT_HEADER_NAME="Authorization",
+        JWT_HEADER_TYPE="Bearer",
+        JWT_ERROR_MESSAGE_KEY="error",
+        JWT_BLOCKLIST_ENABLED=True,
+        JWT_BLOCKLIST_TOKEN_CHECKS=["access", "refresh"]
     )
     
     # Initialize the database
     db.init_app(app)
     
+    # Initialize migrations
+    migrate.init_app(app, db)
+    
     # Initialize JWT manager
     jwt.init_app(app)
+    
+    # Register JWT callbacks
+    jwt.token_in_blocklist_loader(check_if_token_revoked)
     
     # register blueprints
     app.register_blueprint(

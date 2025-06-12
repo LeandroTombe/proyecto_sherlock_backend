@@ -23,14 +23,27 @@ def register_jwt_handlers(jwt):
             'error': 'missing_token'
         }), 401
 
+    @jwt.revoked_token_loader
+    def revoked_token_callback(jwt_header, jwt_payload):
+        return jsonify({
+            'message': 'token ha sido revocado',
+            'error': 'token_revoked'
+        }), 401
     
     @jwt.additional_claims_loader
     def add_claims_to_access_token(identity):
+        user = User.query.get(identity)
+        if user is None:
+            return {'roles': []}
+            
+        # Obtener los nombres de los roles del usuario
+        roles = [role.name for role in user.roles]
         
-        if identity == "admin":
-            return {'is_admin': True}
-        return {'is_admin': False}
-    
+        return {
+            'roles': roles,
+            'username': user.username,
+            'email': user.email
+        }
     
     @jwt.user_lookup_loader
     def user_lookup_callback(_jwt_header, jwt_data):

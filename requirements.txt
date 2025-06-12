@@ -6,3 +6,4 @@ Flask-SQLAlchemy
 flask-jwt-extended
 marshmallow
 psycopg2
+Flask-Migrate

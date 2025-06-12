@@ -7,7 +7,9 @@ from flask_jwt_extended import (
     current_user,
     get_jwt_identity,
 )
-from models import User
+from models import User, TokenBlocklist, Role
+from extensions import db
+from datetime import datetime, UTC
 
 auth_bp = Blueprint("auth", __name__)
 
@@ -28,10 +30,22 @@ def register_user():
     )
 
     new_user.set_password(password=data.get("password"))
-
+    
+    # Asignar rol 'user' por defecto
+    user_role = Role.query.filter_by(name='user').first()
+    if not user_role:
+        # Si el rol no existe, crearlo
+        user_role = Role(name='user', description='Usuario normal')
+        db.session.add(user_role)
+        db.session.commit()
+    
+    new_user.roles.append(user_role)
     new_user.save()
 
-    return jsonify({"message": "Usuario creado"}), 201
+    return jsonify({
+        "message": "Usuario creado",
+        "roles": [role.name for role in new_user.roles]
+    }), 201
 
 
 @auth_bp.post("/login")
@@ -61,6 +75,7 @@ def whoami():
             "user_details": {
                 "username": current_user.username,
                 "email": current_user.email,
+                "roles": [role.name for role in current_user.roles]
             },
         }
     )
@@ -74,5 +89,17 @@ def refresh_token():
     access_token = create_access_token(identity=identity)
     
     return jsonify({"access_token": access_token}), 200
+    
+
+@auth_bp.delete("/logout")
+@jwt_required()
+def logout():
+    jti = get_jwt()["jti"]
+    now = datetime.now(UTC)
+    
+    db.session.add(TokenBlocklist(jti=jti, user_id=current_user.id))
+    db.session.commit()
+    
+    return jsonify({"message": "Sesión cerrada exitosamente"}), 200
     
     
