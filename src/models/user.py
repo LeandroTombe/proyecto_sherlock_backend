@@ -1,4 +1,4 @@
-from extensions import db
+from src.config.extensions import db
 from uuid import uuid4
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime, UTC

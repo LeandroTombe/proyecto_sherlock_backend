@@ -1,4 +1,5 @@
 from marshmallow import Schema, fields, post_load
+from src.models.user import User
 
 class UserSchema(Schema):
     id = fields.String()
@@ -7,5 +8,4 @@ class UserSchema(Schema):
 
     @post_load
     def make_user(self, data, **kwargs):
-        from models import User  # Import here to avoid circular import
         return User(**data)

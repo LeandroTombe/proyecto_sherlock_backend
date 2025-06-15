@@ -1,8 +1,8 @@
 from flask import Blueprint,request, jsonify
-from models import User, Role
-from schemas import UserSchema
+from src.models.user import User, Role
+from src.api.schemas import UserSchema
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from decorators import role_required
+from src.services.decorators import role_required
 
 user_bp = Blueprint("users", __name__)
 

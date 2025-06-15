@@ -7,8 +7,8 @@ from flask_jwt_extended import (
     current_user,
     get_jwt_identity,
 )
-from models import User, TokenBlocklist, Role
-from extensions import db
+from src.models.user import User, TokenBlocklist, Role
+from src.config.extensions import db
 from datetime import datetime, UTC
 
 auth_bp = Blueprint("auth", __name__)

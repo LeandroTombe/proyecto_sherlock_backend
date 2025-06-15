@@ -1,5 +1,5 @@
 from extensions import db
-from models import TokenBlocklist
+from src.models.user import TokenBlocklist
 
 def check_if_token_revoked(jwt_header, jwt_payload: dict) -> bool:
     jti = jwt_payload["jti"]

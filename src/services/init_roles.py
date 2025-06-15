@@ -1,6 +1,6 @@
 from main import create_app
-from extensions import db
-from models import Role, User
+from src.config.extensions import db
+from src.models.user import Role, User
 
 def init_roles():
     app = create_app()

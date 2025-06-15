@@ -1,23 +1,18 @@
 from flask import Flask, jsonify
 from dotenv import load_dotenv
-from extensions import db, jwt, migrate
-from auth import auth_bp
-from users import user_bp
-from jwt_handlers import register_jwt_handlers
-from jwt_callbacks import check_if_token_revoked
+from src.config.extensions import db, jwt, migrate
+from src.api.auth_routes import auth_bp
+from src.api.jwt_handlers import register_jwt_handlers
 import os
 
-# Cargar variables de entorno con manejo de codificación
-load_dotenv(encoding='latin-1')  # o 'utf-8-sig' si el archivo tiene BOM
+# Cargar variables de entorno
+load_dotenv(encoding='latin-1')
 
 def create_app():
-    # Create and configure the Flask application
     app = Flask(__name__)
     
-    # Load configuration from environment variables
+    # Configuración
     app.config.from_prefixed_env()
-    
-    # Set default configuration for microservice
     app.config.update(
         SQLALCHEMY_DATABASE_URI=os.getenv('DATABASE_URL'),
         SQLALCHEMY_TRACK_MODIFICATIONS=False,
@@ -32,31 +27,16 @@ def create_app():
         JWT_BLOCKLIST_TOKEN_CHECKS=["access", "refresh"]
     )
     
-    # Initialize the database
+    # Inicializar extensiones
     db.init_app(app)
-    
-    # Initialize migrations
     migrate.init_app(app, db)
-    
-    # Initialize JWT manager
     jwt.init_app(app)
     
-    # Register JWT callbacks
-    jwt.token_in_blocklist_loader(check_if_token_revoked)
-    
-    # register blueprints
-    app.register_blueprint(
-        auth_bp,
-        url_prefix='/auth'
-    )
-    
-    app.register_blueprint(
-        user_bp,
-        url_prefix='/users'
-    )
-    
-    # Register JWT handlers
+    # Registrar manejadores JWT
     register_jwt_handlers(jwt)
+    
+    # Registrar blueprints
+    app.register_blueprint(auth_bp, url_prefix='/auth')
     
     # Health check endpoint
     @app.route('/health')
