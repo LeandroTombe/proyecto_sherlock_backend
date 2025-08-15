@@ -13,10 +13,17 @@ def create_app():
     
     # Configuración
     app.config.from_prefixed_env()
+    
+    # Configuración de base de datos
+    database_url = os.getenv('DATABASE_URL')
+    if not database_url:
+        # Configuración por defecto para desarrollo local
+        database_url = "postgresql://postgres:postgres@localhost:5432/auth_db_local"
+    
     app.config.update(
-        SQLALCHEMY_DATABASE_URI=os.getenv('DATABASE_URL'),
+        SQLALCHEMY_DATABASE_URI=database_url,
         SQLALCHEMY_TRACK_MODIFICATIONS=False,
-        JWT_SECRET_KEY=os.getenv('FLASK_JWT_SECRET_KEY'),
+        JWT_SECRET_KEY=os.getenv('FLASK_JWT_SECRET_KEY', 'tu_clave_secreta_super_segura_local'),
         JWT_ACCESS_TOKEN_EXPIRES=3600,  # 1 hour
         JWT_REFRESH_TOKEN_EXPIRES=30*24*3600,  # 30 days
         JWT_TOKEN_LOCATION=["headers"],

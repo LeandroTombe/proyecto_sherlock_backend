@@ -1,6 +1,12 @@
+import sys
+import os
+
+# Agregar el directorio raíz del proyecto al path
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
+
 from main import create_app
-from extensions import db
-import models  # Make sure this import is present so SQLAlchemy sees your models
+from src.config.extensions import db
+from src.models.user import User, Role, TokenBlocklist  # Importar modelos para que SQLAlchemy los vea
 
 app = create_app()
 

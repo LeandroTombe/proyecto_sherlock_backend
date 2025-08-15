@@ -4,22 +4,34 @@ Este es un microservicio de autenticación construido con Flask que maneja el re
 
 ## Configuración del Entorno de Desarrollo
 
-Sigue estos pasos para preparar tu entorno de desarrollo de manera sencilla y ordenada:
+### Opción 1: Usar Docker (Recomendada)
 
-### 1. Instalar `virtualenv`
+```bash
+# Clonar el repositorio
+git clone <tu-repositorio>
+cd authMicro
 
+# Configurar variables de entorno
+cp .env.example .env
+# Editar .env con tus valores reales
+
+# Ejecutar con Docker
+docker-compose up --build
+```
+
+### Opción 2: Entorno local
+
+#### 1. Instalar `virtualenv`
 ```bash
 pip3 install virtualenv
 ```
 
-### 2. Crear un entorno virtual
-
+#### 2. Crear un entorno virtual
 ```bash
 virtualenv venv
 ```
 
-### 3. Activar el entorno virtual
-
+#### 3. Activar el entorno virtual
 - **En Windows:**
     ```bash
     .\venv\Scripts\activate
@@ -29,8 +41,7 @@ virtualenv venv
     source venv/bin/activate
     ```
 
-### 4. Instalar las dependencias del proyecto
-
+#### 4. Instalar las dependencias del proyecto
 ```bash
 pip install -r requirements.txt
 ```
@@ -38,14 +49,34 @@ pip install -r requirements.txt
 ## Configuración de la Base de Datos
 
 ### Variables de Entorno
-Crea un archivo `.env` en la raíz del proyecto con el siguiente contenido:
+
+#### Configuración inicial
+1. **Copiar el archivo de ejemplo:**
+```bash
+cp .env.example .env
 ```
-DATABASE_URL=postgresql://postgres:postgres@localhost:5432/tu_base_de_datos
-FLASK_JWT_SECRET_KEY=tu-clave-secreta-aqui
+
+2. **Editar `.env` con tus valores reales:**
+```bash
+# Configuración de Flask
 FLASK_APP=main.py
 FLASK_ENV=development
+FLASK_DEBUG=1
+
+# Clave secreta para JWT (¡CAMBIA ESTA CLAVE!)
+FLASK_JWT_SECRET_KEY=mi_clave_secreta_super_segura_123456789
+
+# Base de datos local
+DATABASE_URL=postgresql://postgres:tu_password@localhost:5432/auth_db_local
+
+# Puerto de la aplicación
 PORT=5000
 ```
+
+#### ⚠️ IMPORTANTE
+- **NO subir `.env` a GitHub** (ya está en `.gitignore`)
+- **SÍ subir `.env.example`** para que otros desarrolladores sepan qué configurar
+- Cambia `FLASK_JWT_SECRET_KEY` por una clave única y segura
 
 ### Migraciones de Base de Datos
 El proyecto utiliza Flask-Migrate para manejar las migraciones de la base de datos. Los comandos principales son:
@@ -94,14 +125,21 @@ python migrations.py
 
 ```
 .
-├── main.py              # Punto de entrada de la aplicación
-├── auth.py             # Rutas de autenticación
-├── users.py            # Rutas de usuarios
-├── models.py           # Modelos de base de datos
-├── extensions.py       # Extensiones de Flask
-├── jwt_handlers.py     # Manejadores de JWT
-├── migrations.py       # Script de migraciones
-└── requirements.txt    # Dependencias del proyecto
+├── main.py                 # Punto de entrada de la aplicación
+├── .env.example           # Variables de entorno de ejemplo
+├── .env                   # Variables de entorno reales (NO subir a GitHub)
+├── docker-compose.yml     # Configuración de Docker
+├── Dockerfile             # Imagen de Docker
+├── requirements.txt       # Dependencias del proyecto
+├── src/
+│   ├── api/              # Rutas de la API
+│   ├── config/           # Configuración y extensiones
+│   ├── models/           # Modelos de base de datos
+│   ├── repositories/     # Capa de acceso a datos
+│   └── services/         # Lógica de negocio
+├── migrations/            # Migraciones de base de datos
+├── nginx/                 # Configuración de Nginx
+└── tests/                 # Tests unitarios
 ```
 
 ## Ejecutar el Servidor

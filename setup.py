@@ -1,0 +1,25 @@
+from setuptools import setup, find_packages
+
+setup(
+    name="auth-microservice",
+    version="1.0.0",
+    packages=find_packages(),
+    install_requires=[
+        "Flask==3.0.2",
+        "Werkzeug==3.0.1",
+        "SQLAlchemy==2.0.28",
+        "Flask-SQLAlchemy==3.1.1",
+        "Flask-JWT-Extended==4.6.0",
+        "Flask-Migrate==4.0.5",
+        "psycopg2-binary==2.9.9",
+        "python-dotenv==1.0.1",
+        "gunicorn==21.2.0",
+        "pytest==8.0.2",
+        "pytest-mock==3.12.0",
+        "pytest-cov==4.1.0",
+        "black==24.2.0",
+        "flake8==7.0.0",
+        "mypy==1.8.0",
+        "marshmallow==3.20.2",
+    ],
+) 
